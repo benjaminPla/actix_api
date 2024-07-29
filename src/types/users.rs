@@ -37,4 +37,19 @@ impl UserResponse {
             .unwrap();
         user
     }
+
+    pub fn get_users(db: web::Data<Arc<Mutex<Connection>>>) -> Vec<UserResponse> {
+        let conn = db.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT email, id FROM users;").unwrap();
+        let users_iter = stmt
+            .query_map([], |row| {
+                Ok(Self {
+                    email: row.get(0).unwrap(),
+                    id: row.get(1).unwrap(),
+                })
+            })
+            .unwrap();
+        let users: Vec<UserResponse> = users_iter.map(|user| user.unwrap()).collect();
+        users
+    }
 }
