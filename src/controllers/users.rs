@@ -1,4 +1,5 @@
 use actix_web::{HttpResponse, HttpRequest, Responder, web};
+use crate::types::authentication::Authentication;
 use crate::types::users::User;
 use rusqlite::Connection;
 use serde::Deserialize;
@@ -26,20 +27,35 @@ pub async fn create_user(
 }
 
 pub async fn get_users(
-    db:web::Data<Arc<Mutex<Connection>>>,
+    db: web::Data<Arc<Mutex<Connection>>>,
     req: HttpRequest
-    ) -> impl Responder {
-    if let Some(auth_header) = req.headers().get("Authorization") {
-        if let Ok(auth_value) = auth_header.to_str() {
-            if !auth_value.is_empty() {
-                return match User::get_users(db) {
-                    Ok(users) => {
-                        HttpResponse::Ok().json(users)
-                    },
-                    Err(_) => HttpResponse::InternalServerError().finish()
-                }
-            }
-        }
+) -> impl Responder {
+    let auth_header = match req.headers().get("Authorization") {
+        Some(header) => header,
+        None => return HttpResponse::Unauthorized().finish(),
+    };
+
+    let token = match auth_header.to_str() {
+        Ok(value) => value,
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    if token.is_empty() {
+        return HttpResponse::Unauthorized().finish();
     }
-    HttpResponse::Unauthorized().finish()
+
+    let claims = match Authentication::validate_token(token) {
+        Ok(token_data) => token_data.claims,
+        Err(_) => return HttpResponse::Unauthorized().finish(),
+    };
+
+
+    if !claims.user.is_admin {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    match User::get_users(db) {
+        Ok(users) => HttpResponse::Ok().json(users),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
 }

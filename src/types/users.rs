@@ -1,17 +1,17 @@
 use crate::utils::hash_password;
 use actix_web::web;
 use rusqlite::{params, Connection};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct User {
     pub email: String,
     pub id: u32,
     pub is_admin: bool,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Deserialize,Serialize)]
 pub struct UserWithPassword {
     pub email: String,
     pub id: u32,
