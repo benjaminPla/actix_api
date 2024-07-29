@@ -2,6 +2,7 @@ use crate::utils::hash_password;
 use actix_web::web;
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::sync::{Arc, Mutex};
 
 #[derive(Deserialize, Serialize)]
@@ -11,7 +12,7 @@ pub struct User {
     pub is_admin: bool,
 }
 
-#[derive(Deserialize,Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct UserWithPassword {
     pub email: String,
     pub id: u32,
@@ -21,8 +22,9 @@ pub struct UserWithPassword {
 
 impl User {
     pub fn new_admin(db: Arc<Mutex<Connection>>) {
-        let password = "12345";
-        let hashed_password = hash_password(password);
+        let password =
+            env::var("NEW_ADMIN_PASSWORD").expect("Missing `NEW_ADMIN_PASSWORD` env variable");
+        let hashed_password = hash_password(&password);
         let conn = db.lock().unwrap();
         conn.execute(
             "INSERT INTO users (email, is_admin, password) VALUES (?1, ?2, ?3);",
