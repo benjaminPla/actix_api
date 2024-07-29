@@ -4,8 +4,9 @@ mod utils;
 
 use actix_web::{App, HttpServer,HttpResponse, web};
 use crate::controllers::users::{create_user, get_users};
+use crate::types::users::User;
 use crate::controllers::authentication::login;
-use crate::utils::{initialize_db,connect_db};
+use crate::utils::connect_db;
 use rusqlite::Connection;
 use std::sync::{Arc, Mutex};
 
@@ -13,7 +14,7 @@ use std::sync::{Arc, Mutex};
 async fn main() -> std::io::Result<()> {
     let conn: Connection =  connect_db();
     let db = Arc::new(Mutex::new(conn));
-    initialize_db(db.clone());
+    User::new_admin(db.clone());
 
     HttpServer::new(move|| {
         App::new()

@@ -1,3 +1,4 @@
+use crate::types::users::User;
 use jsonwebtoken::{
     // decode, encode, Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation,
     encode,
@@ -5,27 +6,22 @@ use jsonwebtoken::{
     EncodingKey,
     Header,
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 const SECRET_KEY: &[u8] = b"your_secret_key";
 
 pub struct Authentication {}
 
-#[derive(Deserialize)]
-pub struct LoginRequest {
-    pub email: String,
-}
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct Claims {
-    pub sub: String,
+    pub sub: User,
     pub exp: usize,
 }
 
 impl Authentication {
-    pub fn generate_token(email: &str) -> String {
+    pub fn generate_token(user: User) -> String {
         let claims = Claims {
-            sub: email.to_owned(),
+            sub: user,
             exp: (chrono::Utc::now() + chrono::Duration::hours(1)).timestamp() as usize,
         };
         encode(
