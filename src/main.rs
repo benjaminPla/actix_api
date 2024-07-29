@@ -3,9 +3,9 @@ mod types;
 mod utils;
 
 use actix_web::{App, HttpServer,HttpResponse, web};
+use crate::controllers::authentication::login;
 use crate::controllers::users::{create_user, get_users};
 use crate::types::users::User;
-use crate::controllers::authentication::login;
 use crate::utils::connect_db;
 use rusqlite::Connection;
 use std::sync::{Arc, Mutex};

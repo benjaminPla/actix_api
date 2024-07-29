@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse,HttpRequest, Responder, web};
+use actix_web::{HttpResponse, HttpRequest, Responder, web};
 use crate::types::users::User;
 use rusqlite::Connection;
 use serde::Deserialize;
