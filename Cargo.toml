@@ -5,5 +5,8 @@ edition = "2021"
 
 [dependencies]
 actix-web = "^4"
+jsonwebtoken = "8"
+bcrypt = "0.12"
 rusqlite = "0.25"
 serde = { version = "^1", features = ["derive"] }
+chrono = "0.4.38"
