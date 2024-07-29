@@ -1,6 +1,7 @@
 use crate::types::users::User;
 use jsonwebtoken::{
-    decode, encode, Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation,
+    decode, encode, errors::ErrorKind, Algorithm, DecodingKey, EncodingKey, Header, TokenData,
+    Validation,
 };
 use serde::{Deserialize, Serialize};
 
@@ -12,6 +13,12 @@ pub struct Authentication {}
 pub struct Claims {
     pub exp: usize,
     pub user: User,
+}
+
+pub enum TokenValidationError {
+    Expired,
+    Invalid,
+    Other,
 }
 
 impl Authentication {
@@ -28,11 +35,18 @@ impl Authentication {
         .expect("Failed to generate token")
     }
 
-    pub fn validate_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
-        decode::<Claims>(
+    pub fn validate_token(token: &str) -> Result<TokenData<Claims>, TokenValidationError> {
+        match decode::<Claims>(
             token,
             &DecodingKey::from_secret(SECRET_KEY),
             &Validation::new(Algorithm::HS256),
-        )
+        ) {
+            Ok(token_data) => Ok(token_data),
+            Err(err) => match *err.kind() {
+                ErrorKind::ExpiredSignature => Err(TokenValidationError::Expired),
+                ErrorKind::InvalidToken => Err(TokenValidationError::Invalid),
+                _ => Err(TokenValidationError::Other),
+            },
+        }
     }
 }

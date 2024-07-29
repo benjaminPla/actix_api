@@ -1,5 +1,5 @@
 use actix_web::{HttpResponse, HttpRequest, Responder, web};
-use crate::types::authentication::Authentication;
+use crate::types::authentication::{Authentication, TokenValidationError};
 use crate::types::users::User;
 use rusqlite::Connection;
 use serde::Deserialize;
@@ -44,9 +44,11 @@ pub async fn get_users(
         return HttpResponse::Unauthorized().finish();
     }
 
-    let claims = match Authentication::validate_token(token) {
+   let claims = match Authentication::validate_token(&token) {
         Ok(token_data) => token_data.claims,
-        Err(_) => return HttpResponse::Unauthorized().finish(),
+        Err(TokenValidationError::Expired) => return HttpResponse::Unauthorized().body("Token has expired"),
+        Err(TokenValidationError::Invalid) => return HttpResponse::Unauthorized().body("Invalid token"),
+        Err(TokenValidationError::Other) => return HttpResponse::InternalServerError().finish(),
     };
 
 
