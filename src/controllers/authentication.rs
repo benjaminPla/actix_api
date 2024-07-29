@@ -3,13 +3,18 @@ use crate::types::authentication::Authentication;
 use crate::types::users::{User,UserWithPassword};
 use crate::utils::verify_password;
 use rusqlite::Connection;
-use serde::Deserialize;
+use serde::{Deserialize,Serialize};
 use std::sync::{Arc, Mutex};
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
+}
+
+#[derive(Serialize)]
+struct LoginResponse {
+    token: String,
 }
 
 pub async fn login(
@@ -27,7 +32,7 @@ pub async fn login(
                     is_admin: user_with_password.is_admin,
                 };
                 let token = Authentication::generate_token(user);
-                HttpResponse::Ok().json(token)
+                HttpResponse::Ok().json(LoginResponse{token})
             } else {
                 HttpResponse::Unauthorized().finish()
             }
