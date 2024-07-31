@@ -83,3 +83,11 @@ This project provides the following API endpoints:
 - **Protected Endpoints**: The `/users/get_users` endpoint requires the user to be an admin (`is_admin` field set to `true`). The JWT token is validated, and only users with the admin role can access this endpoint.
 
 ## Images
+
+![image](https://github.com/user-attachments/assets/72bfae49-5405-49c5-9438-7192f72357c5)
+
+![image](https://github.com/user-attachments/assets/dc69cc3d-8320-443a-96fc-247f969b1d1f)
+
+![image](https://github.com/user-attachments/assets/36df2b64-6bd7-481a-a491-6465148c3a31)
+
+
