@@ -4,7 +4,7 @@ mod utils;
 
 use actix_web::{App, HttpServer,HttpResponse, web};
 use crate::controllers::authentication::login;
-use crate::controllers::users::{create_user, get_users, update_user_by_id};
+use crate::controllers::users::{create_user, get_users, update_user_by_id, delete_user_by_id};
 use crate::types::users::User;
 use crate::utils::connect_db;
 use dotenv::dotenv;
@@ -29,6 +29,7 @@ async fn main() -> std::io::Result<()> {
             .route("/login", web::post().to(login))
             .service(web::scope("/users")
                 .route("/create_user", web::post().to(create_user))
+                .route("/delete_user_by_id/{id}", web::delete().to(delete_user_by_id))
                 .route("/get_users", web::get().to(get_users))
                 .route("/update_user_by_id/{id}", web::put().to(update_user_by_id))
             )

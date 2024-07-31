@@ -109,3 +109,40 @@ pub async fn update_user_by_id(db: web::Data<Arc<Mutex<Connection>>>,
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
+
+pub async fn delete_user_by_id(db: web::Data<Arc<Mutex<Connection>>>,
+    req: HttpRequest,
+    path: web::Path<u32>
+        ) -> impl Responder{
+    let auth_header = match req.headers().get("Authorization") {
+        Some(header) => header,
+        None => return HttpResponse::Unauthorized().finish(),
+    };
+
+    let token = match auth_header.to_str() {
+        Ok(value) => value,
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    if token.is_empty() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+   let claims = match Authentication::validate_token(&token) {
+        Ok(token_data) => token_data.claims,
+        Err(TokenValidationError::Expired) => return HttpResponse::Unauthorized().body("Token has expired"),
+        Err(TokenValidationError::Invalid) => return HttpResponse::Unauthorized().body("Invalid token"),
+        Err(TokenValidationError::Other) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    if !claims.user.is_admin {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    let id = path.into_inner();
+
+    match User::delete_user_by_id(db, id) {
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish()
+    }
+}
