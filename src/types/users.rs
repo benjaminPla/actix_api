@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::sync::{Arc, Mutex};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct User {
     pub email: String,
     pub id: u32,
@@ -68,6 +68,31 @@ impl User {
         })?;
         let users: Vec<User> = users_iter.map(|user| user.unwrap()).collect();
         Ok(users)
+    }
+
+    pub fn update_user_by_id(
+        db: web::Data<Arc<Mutex<Connection>>>,
+        id: u32,
+        is_admin: bool,
+    ) -> Result<Option<User>, rusqlite::Error> {
+        let conn = db.lock().unwrap();
+        let mut stmt = conn.prepare("SELECT email, is_admin FROM users WHERE id = ?1;")?;
+        let mut rows = stmt.query(params![id])?;
+        match rows.next()? {
+            Some(row) => {
+                let email: String = row.get(0)?;
+                conn.execute(
+                    "UPDATE users SET is_admin = ?2 WHERE id = ?2;",
+                    params![is_admin, id],
+                )?;
+                Ok(Some(Self {
+                    id,
+                    email,
+                    is_admin,
+                }))
+            }
+            None => Ok(None),
+        }
     }
 }
 
