@@ -69,12 +69,14 @@ To run the project locally, follow these steps:
 
 This project provides the following API endpoints:
 
-| Endpoint             | Description                                      | HTTP Method |
-| -------------------- | ------------------------------------------------ | ----------- |
-| `/status`            | Check server status                              | GET         |
-| `/login`             | User login endpoint, requires email and password | POST        |
-| `/users/get_users`   | Retrieve a list of all users (admin only)        | GET         |
-| `/users/create_user` | Create a new user                                | POST        |
+| Endpoint                        | Description                                      | HTTP Method |
+| ------------------------------- | ------------------------------------------------ | ----------- |
+| `/login`                        | User login endpoint, requires email and password | POST        |
+| `/status`                       | Check server status                              | GET         |
+| `/users/create_user`            | Create a new user                                | POST        |
+| `/users/delete_user_by_id/{id}` | Delete a user by id                              | DELETE      |
+| `/users/get_users`              | Retrieve a list of all users (admin only)        | GET         |
+| `/users/update_user_by_id/{id}` | Update a user by id                              | PUT         |
 
 ### JWT Authentication
 
@@ -89,5 +91,3 @@ This project provides the following API endpoints:
 ![image](https://github.com/user-attachments/assets/dc69cc3d-8320-443a-96fc-247f969b1d1f)
 
 ![image](https://github.com/user-attachments/assets/36df2b64-6bd7-481a-a491-6465148c3a31)
-
-
