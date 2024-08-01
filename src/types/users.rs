@@ -56,7 +56,9 @@ impl User {
         Ok(user)
     }
 
-    pub fn get_users(db: web::Data<Arc<Mutex<Connection>>>) -> Result<Vec<User>, rusqlite::Error> {
+    pub fn get_users(
+        db: web::Data<Arc<Mutex<Connection>>>,
+    ) -> Result<Option<Vec<User>>, rusqlite::Error> {
         let conn = db.lock().unwrap();
         let mut stmt = conn.prepare("SELECT email, id, is_admin FROM users;")?;
         let users_iter = stmt.query_map([], |row| {
@@ -67,7 +69,10 @@ impl User {
             })
         })?;
         let users: Vec<User> = users_iter.map(|user| user.unwrap()).collect();
-        Ok(users)
+        match !users.is_empty() {
+            true => Ok(Some(users)),
+            false => Ok(None),
+        }
     }
 
     pub fn update_user_by_id(

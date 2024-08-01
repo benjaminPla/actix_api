@@ -63,9 +63,9 @@ pub async fn get_users(
 
     match User::get_users(db) {
         Ok(users) => {
-            match users.is_empty() {
-                true => HttpResponse::NotFound().body("No users found"),
-                false => HttpResponse::Ok().json(users),
+            match users {
+                Some(users) => HttpResponse::Ok().json(users),
+                None => HttpResponse::NotFound().body("No users found")
             }
         },
         Err(_) => HttpResponse::InternalServerError().finish(),
