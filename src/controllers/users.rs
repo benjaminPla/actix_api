@@ -62,7 +62,12 @@ pub async fn get_users(
     }
 
     match User::get_users(db) {
-        Ok(users) => HttpResponse::Ok().json(users),
+        Ok(users) => {
+            match users.is_empty() {
+                true => HttpResponse::NotFound().body("No users found"),
+                false => HttpResponse::Ok().json(users),
+            }
+        },
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
@@ -142,6 +147,7 @@ pub async fn delete_user_by_id(db: web::Data<Arc<Mutex<Connection>>>,
     let id = path.into_inner();
 
     match User::delete_user_by_id(db, id) {
+        Ok(0) => HttpResponse::NotFound().finish(),
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(_) => HttpResponse::InternalServerError().finish()
     }

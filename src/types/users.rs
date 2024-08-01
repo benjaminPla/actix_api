@@ -98,10 +98,10 @@ impl User {
     pub fn delete_user_by_id(
         db: web::Data<Arc<Mutex<Connection>>>,
         id: u32,
-    ) -> Result<bool, rusqlite::Error> {
+    ) -> Result<usize, rusqlite::Error> {
         let conn = db.lock().unwrap();
-        conn.execute("DELETE FROM users WHERE id = ?1;", params![id])?;
-        Ok(true)
+        let rows_affected = conn.execute("DELETE FROM users WHERE id = ?1;", params![id])?;
+        Ok(rows_affected)
     }
 }
 
