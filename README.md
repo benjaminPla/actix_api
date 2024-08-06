@@ -6,6 +6,7 @@ This project demonstrates a web API built using Actix Web and Rust. The API uses
 
 ## Project Structure
 
+```
 .
 ├── Cargo.lock
 ├── Cargo.toml
@@ -22,6 +23,7 @@ This project demonstrates a web API built using Actix Web and Rust. The API uses
 │   └── utils
 │   └── mod.rs
 └── todo.md
+```
 
 ## Features
 
